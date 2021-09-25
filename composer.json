@@ -1,0 +1,33 @@
+{
+    "name": "clearlyip/laravel-flagsmith",
+    "description": "A Flagsmith client for Laravel",
+    "type": "library",
+    "license": "BSD 3-Clause",
+    "authors": [
+        {
+            "name": "Andrew Nagy",
+            "email": "anagy@clearlyip.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "laravel/framework": "^8.0",
+        "flagsmith/flagsmith-php-client": "dev-main"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/usr/src/flagsmith-php-client"
+        }
+    ],
+    "extra": {
+       "laravel": {
+          "providers": [ "Clearlyip\\LaravelFlagsmith\\ServiceProvider" ]
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Clearlyip\\LaravelFlagsmith\\": "src"
+        }
+    }
+}
