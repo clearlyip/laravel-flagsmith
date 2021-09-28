@@ -1,10 +1,9 @@
 <?php
 namespace Clearlyip\LaravelFlagsmith;
 
-use GuzzleHttp\Client;
-use Psr\Http\Client\ClientInterface;
+use Flagsmith\Flagsmith;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
-
+use Illuminate\Support\Facades\Event;
 class ServiceProvider extends LaravelServiceProvider
 {
     const FLAGSMITH_CONFIG_PATH = __DIR__ . '/../config/flagsmith.php';
@@ -17,14 +16,26 @@ class ServiceProvider extends LaravelServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(self::FLAGSMITH_CONFIG_PATH, 'flagsmith');
-        $this->app
-            ->when(Flagsmith::class)
-            ->needs(ClientInterface::class)
-            ->give(Client::class);
-        $this->app->scoped('flagsmith', function ($app) {
-            return $app->make(Flagsmith::class);
+        $this->app->scoped(Flagsmith::class, function ($app) {
+            $store = config('flagsmith.cache.store', null);
+
+            $cacheFactory = $app->make(
+                \Illuminate\Contracts\Cache\Factory::class
+            );
+
+            $cacheProvider = $cacheFactory->store(
+                $store === 'default' ? null : $store
+            );
+
+            return (new Flagsmith(
+                config('flagsmith.key'),
+                config('flagsmith.host')
+            ))
+                ->withTimeToLive(config('flagsmith.cache.ttl'))
+                ->withCachePrefix(config('flagsmith.cache.prefix'))
+                ->withCache($cacheProvider)
+                ->withUseCacheAsFailover(config('flagsmith.cache.failover'));
         });
-        //$this->app->alias(Flagsmith::class, 'flagsmith');
     }
 
     /**
@@ -40,5 +51,11 @@ class ServiceProvider extends LaravelServiceProvider
             ],
             ['flagsmith']
         );
+        $this->loadRoutesFrom(dirname(__DIR__) . '/routes/flagsmith.php');
+
+        Event::listen(\Illuminate\Auth\Events\Login::class, [
+            \Clearlyip\LaravelFlagsmith\Listeners\UserLogin::class,
+            'handle',
+        ]);
     }
 }

@@ -1,7 +1,7 @@
 <?php
 namespace Clearlyip\LaravelFlagsmith\Concerns;
 
-use Clearlyip\LaravelFlagsmith\Flagsmith;
+use Flagsmith\Flagsmith;
 use Flagsmith\Models\Identity;
 use Flagsmith\Models\IdentityTrait;
 use Illuminate\Support\Facades\App;
@@ -12,16 +12,83 @@ trait HasFeatures
     private array $traits = [];
 
     /**
-     * Get Flagsmith instance
+     * Get Flagsmith instance for this user
      *
      * @return Flagsmith
      */
-    protected function getFlagsmith(): Flagsmith
+    public function getFlagsmith(): Flagsmith
     {
         if (!isset($this->flagsmith)) {
             $this->flagsmith = App::make(Flagsmith::class);
         }
         return $this->flagsmith;
+    }
+
+    /**
+     * Check if features are in cache for this User
+     *
+     * @return boolean
+     */
+    public function featuresInCache(): bool
+    {
+        return $this->getFlagsmith()->hasIdentityInCache($this->getIdentity());
+    }
+
+    /**
+     * Skip Cache
+     *
+     * @param boolean $disable
+     * @return self
+     */
+    public function skipFeatureCache(bool $disable = true): self
+    {
+        //Since Flagsmith is immutable, we need to replace the instance
+        $this->flagsmith = $this->getFlagsmith()->withSkipCache($disable);
+        return $this;
+    }
+
+    /**
+     * Check if Feature is Enabled against this user
+     *
+     * @param string $name
+     * @param boolean $default
+     * @return boolean
+     */
+    public function isFeatureEnabled(string $name, bool $default = false): bool
+    {
+        return $this->getFlagsmith()->isFeatureEnabledByIdentity(
+            $this->getFeatureIdentity(),
+            $name,
+            $default
+        );
+    }
+
+    /**
+     * Get feature value against this user
+     *
+     * @param string $name
+     * @param mixed $default
+     * @return mixed
+     */
+    public function getFeatureValue(string $name, $default = null)
+    {
+        return $this->getFlagsmith()->getFeatureValueByIdentity(
+            $this->getFeatureIdentity(),
+            $name,
+            $default
+        );
+    }
+
+    /**
+     * Get All Features (Flags) for this user
+     *
+     * @return array
+     */
+    public function getFeatures(): array
+    {
+        return $this->getFlagsmith()->getFlagsByIdentity(
+            $this->getFeatureIdentity()
+        );
     }
 
     /**
@@ -67,37 +134,5 @@ trait HasFeatures
         }
 
         return $identity;
-    }
-
-    /**
-     * Check if Feature is Enabled against this user
-     *
-     * @param string $name
-     * @param boolean $default
-     * @return boolean
-     */
-    public function isFeatureEnabled(string $name, bool $default = false): bool
-    {
-        return $this->getFlagsmith()->isFeatureEnabledByIdentity(
-            $this->getFeatureIdentity(),
-            $name,
-            $default
-        );
-    }
-
-    /**
-     * Get feature value against this user
-     *
-     * @param string $name
-     * @param mixed $default
-     * @return mixed
-     */
-    public function getFeatureValue(string $name, $default = null)
-    {
-        return $this->getFlagsmith()->getFeatureValueByIdentity(
-            $this->getFeatureIdentity(),
-            $name,
-            $default
-        );
     }
 }
