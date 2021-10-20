@@ -31,7 +31,9 @@ trait HasFeatures
      */
     public function featuresInCache(): bool
     {
-        return $this->getFlagsmith()->hasIdentityInCache($this->getIdentity());
+        return $this->getFlagsmith()->hasIdentityInCache(
+            $this->getFeatureIdentity()
+        );
     }
 
     /**

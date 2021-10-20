@@ -12,12 +12,12 @@
     "require": {
         "php": ">=7.4",
         "laravel/framework": "^8.0",
-        "flagsmith/flagsmith-php-client": "dev-main"
+        "flagsmith/flagsmith-php-client": "dev-feature/psrs"
     },
     "repositories": [
         {
-            "type": "path",
-            "url": "/usr/src/flagsmith-php-client"
+            "type": "vcs",
+            "url": "https://github.com/clearlyip/flagsmith-php-client"
         }
     ],
     "extra": {
@@ -29,5 +29,9 @@
         "psr-4": {
             "Clearlyip\\LaravelFlagsmith\\": "src"
         }
+    },
+    "require-dev": {
+        "guzzlehttp/psr7": "^2.1",
+        "guzzlehttp/guzzle": "^7.4"
     }
 }

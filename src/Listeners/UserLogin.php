@@ -25,13 +25,13 @@ class UserLogin
     public function handle(Login $event)
     {
         //Our Trait exists
-        if (!method_exists($this->user, 'getFlagsmith')) {
+        if (!method_exists($event->user, 'getFlagsmith')) {
             //TODO: should we log this?
             return;
         }
 
         $queue = config('flagsmith.identity.queue');
-        if (is_null($queue) || !$this->user->featuresInCache()) {
+        if (is_null($queue) || !$event->user->featuresInCache()) {
             SyncUser::dispatchSync($event->user);
         } else {
             SyncUser::dispatch($event->user)->onQueue($queue);
