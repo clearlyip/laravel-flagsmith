@@ -45,6 +45,8 @@ All options are fully documented in the configuration file
 
 It's advised to add the trait `Clearlyip\LaravelFlagsmith\Concerns\HasFeatures` to your user model. This will give you the ability to access features directly from your user object.
 
+During inital login user features are synced through a queue which keeps them as up to date as possible
+
 #### List All Features for a User
 
 ```php
