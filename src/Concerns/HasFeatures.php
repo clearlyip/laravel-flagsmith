@@ -98,7 +98,7 @@ trait HasFeatures
      *
      * @return string
      */
-    protected function getFeatureIdentityId(): string
+    public function getFeatureIdentityId(): string
     {
         $key = config('flagsmith.identity.identifier');
         return (string) $this->{$key};
@@ -109,7 +109,7 @@ trait HasFeatures
      *
      * @return array
      */
-    protected function getFeatureTraits(): array
+    public function getFeatureTraits(): array
     {
         return array_reduce(
             config('flagsmith.identity.traits'),
@@ -126,7 +126,7 @@ trait HasFeatures
      *
      * @return Identity
      */
-    protected function getFeatureIdentity(): Identity
+    public function getFeatureIdentity(): Identity
     {
         $identity = new Identity($this->getFeatureIdentityId());
         foreach ($this->getFeatureTraits() as $key => $value) {
