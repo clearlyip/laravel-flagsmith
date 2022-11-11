@@ -55,7 +55,8 @@ class Webhooks
                             'name' => $state['feature']['name'],
                             'created_date' => $state['feature']['created_date'],
                             'description' => $state['feature']['description'],
-                            'inital_value' => $state['feature']['inital_value'],
+                            'initial_value' =>
+                                $state['feature']['initial_value'],
                             'default_enabled' =>
                                 $state['feature']['default_enabled'],
                             'type' => $state['feature']['type'],
@@ -101,7 +102,7 @@ class Webhooks
                         'name' => $state['feature']['name'],
                         'created_date' => $state['feature']['created_date'],
                         'description' => $state['feature']['description'],
-                        'inital_value' => $state['feature']['inital_value'],
+                        'initial_value' => $state['feature']['initial_value'],
                         'default_enabled' =>
                             $state['feature']['default_enabled'],
                         'type' => $state['feature']['type'],
