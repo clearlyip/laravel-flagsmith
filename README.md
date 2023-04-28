@@ -31,6 +31,8 @@ composer require clearlyip/laravel-flagsmith
 | Laravel | Laravel Flagsmith |
 | :------ | :---------------- |
 | 8.x     | 1.x               |
+| 9.x     | 2.x               |
+| 10.x    | 2.1.x             |
 
 ## Usage
 
