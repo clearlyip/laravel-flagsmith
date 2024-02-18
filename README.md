@@ -10,15 +10,15 @@ Laravel-flagsmith was created by, and is maintained by **[Andrew Nagy](https://g
 
 ## Features
 
-- Provides a trait to be able to get features based on Laravel Users ([Flagsmith Identities](https://docs.flagsmith.com/basic-features/managing-identities))
-- Utilizes [Laravel's Queue](https://laravel.com/docs/8.x/queues) system to update features in the background
-- Utilizes [Laravel's Cache](https://laravel.com/docs/8.x/cache) system to store features in a cache for quick access
-- Utilizes [Laravel's Task Scheduling](https://laravel.com/docs/8.x/scheduling) system to update features on a schedule
-- Adds a route to utilize [Flagsmith's webhooks](https://docs.flagsmith.com/advanced-use/system-administration) to update the cache when features change
+-   Provides a trait to be able to get flags based on Laravel Users ([Flagsmith Identities](https://docs.flagsmith.com/basic-features/managing-identities))
+-   Utilizes [Laravel's Queue](https://laravel.com/docs/8.x/queues) system to update flags in the background
+-   Utilizes [Laravel's Cache](https://laravel.com/docs/8.x/cache) system to store flags in a cache for quick access
+-   Utilizes [Laravel's Task Scheduling](https://laravel.com/docs/8.x/scheduling) system to update flags on a schedule
+-   Adds a route to utilize [Flagsmith's webhooks](https://docs.flagsmith.com/advanced-use/system-administration) to update the cache when flags change
 
 ## Installation & Usage
 
-> **Requires [PHP 7.4+](https://php.net/releases/)**
+> **Requires [PHP 8.2+](https://php.net/releases/)**
 
 Require Laravel-flagsmith using [Composer](https://getcomposer.org):
 
@@ -32,46 +32,48 @@ composer require clearlyip/laravel-flagsmith
 | :------ | :---------------- |
 | 8.x     | 1.x               |
 | 9.x     | 2.x               |
-| 10.x    | 2.1.x             |
+| 10.x    | 3.x               |
 
 ## Usage
 
 ### Configuration Files
 
-- Publish the Laravel Flagsmith configuration file using the `vendor:publish` Artisan command. The `flagsmith` configuration file will be placed in your `config` directory (Use `--force` to overwrite your existing `clearly` config file):
-  - `php artisan vendor:publish --tag="flagsmith" [--force]`
+-   Publish the Laravel Flagsmith configuration file using the `vendor:publish` Artisan command. The `flagsmith` configuration file will be placed in your `config` directory (Use `--force` to overwrite your existing `clearly` config file):
+    -   `php artisan vendor:publish --tag="flagsmith" [--force]`
 
 All options are fully documented in the configuration file
 
 ### User
 
-It's advised to add the trait `Clearlyip\LaravelFlagsmith\Concerns\HasFeatures` to your user model. This will give you the ability to access features directly from your user object.
+It's advised to add the interface `Clearlyip\LaravelFlagsmith\Contracts\UserFlags` to your user model. This will give you the ability to access flags directly from your user object.
 
-During inital login user features are synced through a queue which keeps them as up to date as possible
+You can add the following trait `Clearlyip\LaravelFlagsmith\Concerns\HasFlagss` to your user model to fulfill the requirements of `UserFlags`
 
-#### List All Features for a User
+During initial login user flags are synced through a queue which keeps them as up to date as possible
+
+#### Get All Flags for a User
 
 ```php
 $user = Auth::user();
-$features = $user->getFeatures();
+$flags = $user->getFlags();
 ```
 
-### Check if feature is enabled for a user
+### Check if flag is enabled for a user
 
-An optional second parameter can be added as the default if the feature does not exist
+An optional second parameter can be added as the default if the flag does not exist
 
 ```php
 $user = Auth::user();
-$features = $user->isFeatureEnabled('foo');
+$flags = $user->isFlagEnabled('foo');
 ```
 
-#### Get a Features value for a User
+#### Get a Flag value for a User
 
-An optional second parameter can be added as the default if the feature does not exist
+An optional second parameter can be added as the default if the flag does not exist
 
 ```php
 $user = Auth::user();
-$features = $user->getFeatureValue('foo');
+$vakue = $user->getFlagValue('foo');
 ```
 
 ### Accessing

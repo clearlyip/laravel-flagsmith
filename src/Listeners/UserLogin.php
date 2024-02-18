@@ -1,6 +1,8 @@
 <?php
+
 namespace Clearlyip\LaravelFlagsmith\Listeners;
 
+use Clearlyip\LaravelFlagsmith\Contracts\UserFlags;
 use Clearlyip\LaravelFlagsmith\Jobs\SyncUser;
 use Illuminate\Auth\Events\Login;
 
@@ -24,17 +26,27 @@ class UserLogin
      */
     public function handle(Login $event)
     {
-        //Our Trait exists
-        if (!method_exists($event->user, 'getFlagsmith')) {
-            //TODO: should we log this?
+        $user = $event->user;
+
+        if (!($user instanceof UserFlags)) {
             return;
         }
 
         $queue = config('flagsmith.identity.queue');
-        if (is_null($queue) || !$event->user->featuresInCache()) {
-            SyncUser::dispatchSync($event->user);
+        if ($queue === null) {
+            return;
+        }
+
+        $cache = $user->getFlagsmith()->getCache();
+        if ($cache === null) {
+            return;
+        }
+
+        //Doesn't exist so get it now
+        if (!$cache->has('Indentity.' . $user->getFlagIdentityId())) {
+            SyncUser::dispatchSync($user);
         } else {
-            SyncUser::dispatch($event->user)->onQueue($queue);
+            SyncUser::dispatch($user)->onQueue($queue);
         }
     }
 }

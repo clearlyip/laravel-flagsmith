@@ -1,15 +1,23 @@
 <?php
+
 namespace Clearlyip\LaravelFlagsmith\Http\Controllers;
 
 use Flagsmith\Flagsmith;
-use Flagsmith\Models\Identity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
+use stdClass;
 
 class Webhooks
 {
-    public function feature(Request $request)
-    {
+    /**
+     * Handles the feature logic based on the given request.
+     *
+     * @param Request $request The request object
+     * @return \Illuminate\Http\Response|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\JsonResponse
+     */
+    public function feature(
+        Request $request,
+    ): \Illuminate\Http\Response|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\JsonResponse {
         $event_type = $request->input('event_type');
 
         if ($event_type !== 'FLAG_UPDATED') {
@@ -27,95 +35,95 @@ class Webhooks
         $state = $request->input('data.new_state');
         $identityId = $request->input('data.new_state.identity_identifier');
         $cache = $flagsmith->getCache();
+        if ($cache === null) {
+            return response('');
+        }
 
         //This is specifically an identity flag change
         if (!empty($identityId)) {
-            $identity = $cache->get("identity.{$identityId}");
-            if (!is_null($identity)) {
-                //TODO: This does not seem the best way to do this
-                $new = true;
-                foreach ($identity['flags'] as &$flag) {
-                    if ($flag['feature']['id'] === $state['feature']['id']) {
-                        $flag['feature_state_value'] =
-                            $state['feature_state_value'];
-                        $flag['enabled'] = $state['enabled'];
-                        $new = false;
-                        break;
-                    }
-                }
-                if ($new) {
-                    $identity['flags'][] = [
-                        'id' => null,
-                        'feature_state_value' => $state['feature_state_value'],
-                        'enabled' => $state['enabled'],
-                        'environment' => $state['environment']['id'],
-                        'feature_segment' => $state['feature_segment'],
-                        'feature' => [
-                            'id' => $state['feature']['id'],
-                            'name' => $state['feature']['name'],
-                            'created_date' => $state['feature']['created_date'],
-                            'description' => $state['feature']['description'],
-                            'initial_value' =>
-                                $state['feature']['initial_value'],
-                            'default_enabled' =>
-                                $state['feature']['default_enabled'],
-                            'type' => $state['feature']['type'],
-                        ],
-                    ];
-                }
-
-                $cache->set("identity.{$identityId}", $identity);
-
+            $identity = $cache->get("Identity.{$identityId}");
+            if ($identity === null) {
+                //No cache point exists so update all
+                $flagsmith->withSkipCache(true)->getIdentityFlags($identityId);
                 return response('');
             }
+            $existingKey = null;
+            foreach ($identity->flags as $key => $flag) {
+                if ($flag->feature->id === $state['feature']['id']) {
+                    $existingKey = $key;
+                    break;
+                }
+            }
 
-            //No cache point exists so update all
-            $flagsmith->getIdentityByIndentity(new Identity($identityId));
+            if ($existingKey !== null) {
+                $identity->flags[$existingKey]->feature_state_value =
+                    $state['feature_state_value'];
+                $identity->flags[$existingKey]->enabled = $state['enabled'];
+            } else {
+                $feature = new stdClass();
+                $feature->id = $state['feature']['id'];
+                $feature->name = $state['feature']['name'];
+                $feature->created_date = $state['feature']['created_date'];
+                $feature->description = $state['feature']['description'];
+                $feature->initial_value = $state['feature']['initial_value'];
+                $feature->default_enabled =
+                    $state['feature']['default_enabled'];
+                $feature->type = $state['feature']['type'];
+
+                $flag = new stdClass();
+                $flag->feature_state_value = $state['feature_state_value'];
+                $flag->enabled = $state['enabled'];
+                $flag->environment = $state['environment']['id'];
+                $flag->feature_segment = $state['feature_segment'];
+                $flag->feature = $feature;
+                $identity->flags[] = $flag;
+            }
+
+            $cache->set("Identity.{$identityId}", $identity);
+
             return response('');
         }
 
         //Global cache needs to be updated
-        $global = $cache->get('global');
+        $global = $cache->get('Global');
 
-        //A Previous cache point exists
-        if (!is_null($global)) {
-            //TODO: This does not seem the best way to do this
-            $new = true;
-            foreach ($global as &$flag) {
-                if ($flag['feature']['id'] === $state['feature']['id']) {
-                    $flag['feature_state_value'] =
-                        $state['feature_state_value'];
-                    $flag['enabled'] = $state['enabled'];
-                    $new = false;
-                    break;
-                }
-            }
-            if ($new) {
-                $global[] = [
-                    'id' => null,
-                    'feature_state_value' => $state['feature_state_value'],
-                    'enabled' => $state['enabled'],
-                    'environment' => $state['environment']['id'],
-                    'feature_segment' => $state['feature_segment'],
-                    'feature' => [
-                        'id' => $state['feature']['id'],
-                        'name' => $state['feature']['name'],
-                        'created_date' => $state['feature']['created_date'],
-                        'description' => $state['feature']['description'],
-                        'initial_value' => $state['feature']['initial_value'],
-                        'default_enabled' =>
-                            $state['feature']['default_enabled'],
-                        'type' => $state['feature']['type'],
-                    ],
-                ];
-            }
-
-            $cache->set('global', $global);
+        if ($global === null) {
+            $flagsmith->getEnvironmentFlags();
             return response('');
         }
 
-        //No cache point exists so update all
-        $flagsmith->getFlags();
+        $existingKey = null;
+        foreach ($global->flags as $key => $flag) {
+            if ($flag->feature->id === $state['feature']['id']) {
+                $existingKey = $key;
+                break;
+            }
+        }
+
+        if ($existingKey !== null) {
+            $global->flags[$existingKey]->feature_state_value =
+                $state['feature_state_value'];
+            $global->flags[$existingKey]->enabled = $state['enabled'];
+        } else {
+            $feature = new stdClass();
+            $feature->id = $state['feature']['id'];
+            $feature->name = $state['feature']['name'];
+            $feature->created_date = $state['feature']['created_date'];
+            $feature->description = $state['feature']['description'];
+            $feature->initial_value = $state['feature']['initial_value'];
+            $feature->default_enabled = $state['feature']['default_enabled'];
+            $feature->type = $state['feature']['type'];
+
+            $flag = new stdClass();
+            $flag->feature_state_value = $state['feature_state_value'];
+            $flag->enabled = $state['enabled'];
+            $flag->environment = $state['environment']['id'];
+            $flag->feature_segment = $state['feature_segment'];
+            $flag->feature = $feature;
+            $global->flags[] = $flag;
+        }
+
+        $cache->set('Global', $global);
         return response('');
     }
 }

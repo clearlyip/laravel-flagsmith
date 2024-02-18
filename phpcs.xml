@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<ruleset name="Custom Standard" namespace="MyProject\CS\Standard">
+	<!-- https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-Ruleset -->
+	<description>ClearlyIP coding standards</description>
+	<file>./src</file>
+	<exclude-pattern>*/data/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+	<exclude-pattern>*/tests/*</exclude-pattern>
+	<arg value="sp"/>
+
+	<rule ref="PSR12"/>
+
+	<!-- This option is good for inspecting extended methods, however using ReflectionClass may cause phpcs crashes while editing (not possible to catch FatalError). -->
+	<!-- <autoload>./vendor/autoload.php</autoload> -->
+	<!-- https://github.com/gskema/phpcs-type-sniff -->
+	<!--
+	<rule ref="./vendor/gskema/phpcs-type-sniff/src/Sniffs/CompositeCodeElementSniff.php">
+		<properties>
+			<property name="useReflection" value="true"/>
+		</properties>
+		<exclude name="Gskema.Sniffs.CompositeCodeElement.FqcnMethodSniff"/>
+		<exclude name="Gskema.Sniffs.CompositeCodeElement.FqcnConstSniff"/>
+	</rule>
+	-->
+
+	<rule ref="Generic.Files.LineLength.TooLong">
+		<!-- This is enforced by prettier -->
+		<exclude name="Generic.Files.LineLength.TooLong"/>
+	</rule>
+
+	<rule ref="Squiz.ControlStructures.ForEachLoopDeclaration">
+		<!-- This will break as a result of prettier so dont enforce it -->
+		<exclude name="Squiz.ControlStructures.ForEachLoopDeclaration.SpacingBeforeAs" />
+	</rule>
+
+	<rule ref="Squiz.ControlStructures.ControlSignature">
+		<!-- This will break as a result of prettier so dont enforce it -->
+		<exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseBrace" />
+	</rule>
+
+	<rule ref="Squiz.Functions.MultiLineFunctionDeclaration">
+		<!-- This will break as a result of prettier so dont enforce it -->
+		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.OneParamPerLine" />
+		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.UseOneParamPerLine" />
+	</rule>
+
+	<rule ref="Generic.WhiteSpace.DisallowTabIndent">
+		<exclude name="Generic.WhiteSpace.DisallowTabIndent.TabsUsed" />
+	</rule>
+
+
+</ruleset>

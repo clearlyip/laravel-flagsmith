@@ -1,6 +1,8 @@
 <?php
+
 namespace Clearlyip\LaravelFlagsmith\Jobs;
 
+use Clearlyip\LaravelFlagsmith\Contracts\UserFlags;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -10,16 +12,20 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 class SyncUser implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
-    private Authenticatable $user;
+    private Authenticatable&UserFlags $user;
 
     /**
      * Create a new job instance.
      *
+     * @param  Authenticatable&UserFlags  $user
      * @return void
      */
-    public function __construct(Authenticatable $user)
+    public function __construct(Authenticatable&UserFlags $user)
     {
         $this->user = $user;
     }
@@ -31,12 +37,6 @@ class SyncUser implements ShouldQueue
      */
     public function handle()
     {
-        //Our Trait exists
-        if (!method_exists($this->user, 'getFlagsmith')) {
-            return;
-        }
-
-        $this->user->skipFeatureCache(true);
-        $this->user->getFeatures();
+        $this->user->skipFlagCache(true)->getFlags();
     }
 }
