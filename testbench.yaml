@@ -1,5 +1,5 @@
 providers:
-  # - Workbench\App\Providers\WorkbenchServiceProvider
+ - Clearlyip\LaravelFlagsmith\ServiceProvider
 
 migrations:
   - workbench/database/migrations

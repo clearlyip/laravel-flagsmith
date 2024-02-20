@@ -56,27 +56,11 @@ class Webhooks
             }
 
             if ($existingKey !== null) {
-                $identity->flags[$existingKey]->feature_state_value =
-                    $state['feature_state_value'];
-                $identity->flags[$existingKey]->enabled = $state['enabled'];
+                $identity->flags[$existingKey] = json_decode(
+                    json_encode($state),
+                );
             } else {
-                $feature = new stdClass();
-                $feature->id = $state['feature']['id'];
-                $feature->name = $state['feature']['name'];
-                $feature->created_date = $state['feature']['created_date'];
-                $feature->description = $state['feature']['description'];
-                $feature->initial_value = $state['feature']['initial_value'];
-                $feature->default_enabled =
-                    $state['feature']['default_enabled'];
-                $feature->type = $state['feature']['type'];
-
-                $flag = new stdClass();
-                $flag->feature_state_value = $state['feature_state_value'];
-                $flag->enabled = $state['enabled'];
-                $flag->environment = $state['environment']['id'];
-                $flag->feature_segment = $state['feature_segment'];
-                $flag->feature = $feature;
-                $identity->flags[] = $flag;
+                $identity->flags[] = json_decode(json_encode($state));
             }
 
             $cache->set("Identity.{$identityId}", $identity);
@@ -93,7 +77,7 @@ class Webhooks
         }
 
         $existingKey = null;
-        foreach ($global->flags as $key => $flag) {
+        foreach ($global as $key => $flag) {
             if ($flag->feature->id === $state['feature']['id']) {
                 $existingKey = $key;
                 break;
@@ -101,9 +85,19 @@ class Webhooks
         }
 
         if ($existingKey !== null) {
-            $global->flags[$existingKey]->feature_state_value =
+            $global[$existingKey]->feature->default_enabled =
+                $state['feature']['default_enabled'];
+            $global[$existingKey]->feature->description =
+                $state['feature']['description'];
+            $global[$existingKey]->feature->initial_value =
+                $state['feature']['initial_value'];
+            $global[$existingKey]->feature->type = $state['feature']['type'];
+            $global[$existingKey]->feature_state_value =
                 $state['feature_state_value'];
-            $global->flags[$existingKey]->enabled = $state['enabled'];
+            $global[$existingKey]->environment = $state['environment']['id'];
+            $global[$existingKey]->identity = $state['identity'];
+            $global[$existingKey]->feature_segment = $state['feature_segment'];
+            $global[$existingKey]->enabled = $state['enabled'];
         } else {
             $feature = new stdClass();
             $feature->id = $state['feature']['id'];
@@ -115,12 +109,14 @@ class Webhooks
             $feature->type = $state['feature']['type'];
 
             $flag = new stdClass();
-            $flag->feature_state_value = $state['feature_state_value'];
-            $flag->enabled = $state['enabled'];
-            $flag->environment = $state['environment']['id'];
-            $flag->feature_segment = $state['feature_segment'];
+            $flag->id = null; //unsure what this represents
             $flag->feature = $feature;
-            $global->flags[] = $flag;
+            $flag->feature_state_value = $state['feature_state_value'];
+            $flag->environment = $state['environment']['id'];
+            $flag->identity = $state['identity'];
+            $flag->feature_segment = $state['feature_segment'];
+            $flag->enabled = $state['enabled'];
+            $global[] = $flag;
         }
 
         $cache->set('Global', $global);

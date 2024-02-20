@@ -53,7 +53,7 @@ interface UserFlags
      *
      * @return string
      */
-    public function getFlagIdentityId(): string;
+    public function getFlagIdentityId(): ?string;
 
     /**
      * Get the Traits to send to the API for this Identity

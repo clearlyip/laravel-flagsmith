@@ -44,6 +44,7 @@
     },
     "autoload-dev": {
         "psr-4": {
+            "CIP\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/",
             "Workbench\\Database\\Factories\\": "workbench/database/factories/",
             "Workbench\\Database\\Seeders\\": "workbench/database/seeders/"
@@ -61,7 +62,12 @@
             "Composer\\Config::disableProcessTimeout",
             "@build",
             "@php vendor/bin/testbench serve"
-        ]
+        ],
+        "test": "XDEBUG_MODE=coverage phpunit --configuration phpunit.xml",
+        "test:filter": "XDEBUG_MODE=coverage,debug phpunit --configuration phpunit.xml --filter",
+        "psalm": "psalm",
+        "phpcs": "phpcs --standard=phpcs.xml",
+        "phpcbf": "phpcbf --standard=phpcs.xml"
     },
     "repositories": [
         {

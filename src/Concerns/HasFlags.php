@@ -18,6 +18,7 @@ trait HasFlags
      */
     public function getFlagsmith(): Flagsmith
     {
+        /** @psalm-suppress RedundantPropertyInitializationCheck */
         if (!isset($this->flagsmith)) {
             $this->flagsmith = App::make(Flagsmith::class);
         }
@@ -30,10 +31,19 @@ trait HasFlags
     public function getFlags(): FlagModelsList
     {
         $identity = $this->getFlagIdentity();
+        $finalizedTraits = null;
+        $traits = $identity->getTraits();
+        if ($traits !== null) {
+            $finalizedTraits = [];
+            foreach ($traits as $trait) {
+                $finalizedTraits[$trait->getKey()] = $trait->getValue();
+            }
+        }
+
         return $this->getFlagsmith()
             ->getIdentityFlags(
                 $identity->getId(),
-                (object) $identity->getTraits(),
+                $finalizedTraits !== null ? (object) $finalizedTraits : null,
             )
             ->getFlags();
     }
@@ -83,9 +93,12 @@ trait HasFlags
     /**
      * {@inheritDoc}
      */
-    public function getFlagIdentityId(): string
+    public function getFlagIdentityId(): ?string
     {
         $key = config('flagsmith.identity.identifier');
+        if ($key === null) {
+            return null;
+        }
         return $this->getRawOriginal($key);
     }
 
@@ -97,7 +110,7 @@ trait HasFlags
     public function getFlagTraits(): array
     {
         return array_reduce(
-            config('flagsmith.identity.traits'),
+            config('flagsmith.identity.traits', []),
             function ($carry, $attribute) {
                 $carry[$attribute] = $this->getRawOriginal($attribute);
                 return $carry;
