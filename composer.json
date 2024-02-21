@@ -12,7 +12,7 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^10.44.0",
-        "flagsmith/flagsmith-php-client": "@dev"
+        "flagsmith/flagsmith-php-client": "dev-working as 4.1.2"
     },
     "extra": {
         "laravel": {
@@ -71,8 +71,8 @@
     },
     "repositories": [
         {
-            "type": "path",
-            "url": "/usr/src/flagsmith-php-client"
+            "type": "vcs",
+            "url": "git@github.com:tm1000/flagsmith-php-client.git"
         }
     ]
 }
