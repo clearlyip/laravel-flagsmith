@@ -43,7 +43,7 @@ class UserLogin
         }
 
         //Doesn't exist so get it now
-        if (!$cache->has('Indentity.' . $user->getFlagIdentityId())) {
+        if (!$cache->has('Identity.' . $user->getFlagIdentityId())) {
             SyncUser::dispatchSync($user);
         } else {
             SyncUser::dispatch($user)->onQueue($queue);
