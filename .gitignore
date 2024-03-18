@@ -1,4 +1,8 @@
-/vendor/
+vendor
+# Before you hate on me for this https://stackoverflow.com/a/21589454
 composer.lock
+node_modules
+output
+.env
+.phpunit.cache
 package-lock.json
-/node_modules/
