@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Event;
 
 class ServiceProvider extends LaravelServiceProvider
 {
-    const FLAGSMITH_CONFIG_PATH = __DIR__ . '/../config/flagsmith.php';
+    public const FLAGSMITH_CONFIG_PATH = __DIR__ . '/../config/flagsmith.php';
 
     /**
      * Register bindings in the container.

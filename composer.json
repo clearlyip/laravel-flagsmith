@@ -11,8 +11,8 @@
     ],
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^10.44.0",
-        "flagsmith/flagsmith-php-client": "dev-working as 4.1.2"
+        "laravel/framework": "^10.44.0 || ^11.0",
+        "flagsmith/flagsmith-php-client": "^4.2.0"
     },
     "extra": {
         "laravel": {
@@ -32,9 +32,9 @@
     "require-dev": {
         "guzzlehttp/psr7": "^2.6.2",
         "guzzlehttp/guzzle": "^7.8.1",
-        "orchestra/testbench": "^8.21.1",
-        "phpunit/phpunit": "^10.5.10",
-        "vimeo/psalm": "^5.22.1",
+        "orchestra/testbench": "^8.22.0",
+        "phpunit/phpunit": "^10.5.13",
+        "vimeo/psalm": "^5.23.1",
         "squizlabs/php_codesniffer": "^3.9.0"
     },
     "config": {
@@ -68,11 +68,5 @@
         "psalm": "psalm",
         "phpcs": "phpcs --standard=phpcs.xml",
         "phpcbf": "phpcbf --standard=phpcs.xml"
-    },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "git@github.com:tm1000/flagsmith-php-client.git"
-        }
-    ]
+    }
 }
