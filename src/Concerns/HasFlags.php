@@ -2,11 +2,13 @@
 
 namespace Clearlyip\LaravelFlagsmith\Concerns;
 
+use BackedEnum;
 use Flagsmith\Flagsmith;
 use Flagsmith\Models\Identity;
 use Flagsmith\Models\IdentityTrait;
 use Flagsmith\Utils\Collections\FlagModelsList;
 use Illuminate\Support\Facades\App;
+use UnitEnum;
 
 trait HasFlags
 {
@@ -112,7 +114,13 @@ trait HasFlags
         return array_reduce(
             config('flagsmith.identity.traits', []),
             function ($carry, $attribute) {
-                $carry[$attribute] = $this->getRawOriginal($attribute);
+                $value = $this->{$attribute};
+                if ($value instanceof BackedEnum) {
+                    $value = $value->value;
+                } elseif ($value instanceof UnitEnum) {
+                    $value = $value->name;
+                }
+                $carry[$attribute] = $value;
                 return $carry;
             },
             [],

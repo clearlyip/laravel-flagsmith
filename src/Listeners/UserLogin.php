@@ -4,6 +4,7 @@ namespace Clearlyip\LaravelFlagsmith\Listeners;
 
 use Clearlyip\LaravelFlagsmith\Contracts\UserFlags;
 use Clearlyip\LaravelFlagsmith\Jobs\SyncUser;
+use Flagsmith\Utils\IdentitiesGenerator;
 use Illuminate\Auth\Events\Login;
 
 class UserLogin
@@ -42,8 +43,13 @@ class UserLogin
             return;
         }
 
+        $key = IdentitiesGenerator::generateIdentitiesCacheKey(
+            $user->getFlagIdentityId(),
+            (object) $user->getFlagTraits(),
+        );
+
         //Doesn't exist so get it now
-        if (!$cache->has('Identity.' . $user->getFlagIdentityId())) {
+        if (!$cache->has($key)) {
             SyncUser::dispatchSync($user);
         } else {
             SyncUser::dispatch($user)->onQueue($queue);
