@@ -46,6 +46,7 @@ class UserLogin
         $key = IdentitiesGenerator::generateIdentitiesCacheKey(
             $user->getFlagIdentityId(),
             (object) $user->getFlagTraits(),
+            false,
         );
 
         //Doesn't exist so get it now
