@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": "^8.2",
-        "laravel/framework": "^10.44.0 || ^11.0",
+        "laravel/framework": "^10.44.0 || ^11.0 || ^12.0",
         "flagsmith/flagsmith-php-client": "^4.4.0"
     },
     "extra": {
